@@ -7,10 +7,12 @@ import com.ani.bazaar.entity.UserEntity;
 import jakarta.transaction.Transactional;
 
 @Transactional
-public interface UserRepository extends JpaRepository<UserEntity, Integer> {
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
 	UserEntity getUserEntityByPhone(long phone);
 
 	UserEntity getUserEntityByPhoneAndOtp(long phone, int otp);
+	
+	UserEntity findById(long id);
 
 }

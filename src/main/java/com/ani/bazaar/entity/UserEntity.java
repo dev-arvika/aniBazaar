@@ -31,7 +31,7 @@ public class UserEntity {
 	@Column(name = "user_name")
 	private String userName;
 
-	@Column(name = "phone")
+	@Column(name = "phone", unique=true)
 	private Long phone;
 
 	private String email;

@@ -32,9 +32,8 @@ public class LoginController {
 	public ResponseEntity<LoginResponseDto> saveUser(@Valid @RequestBody LoginRequestDto loginRequestDto) {
 		UserEntity savedUser = null;
 		UserEntity userDtls = null;
-
-		if (loginRequestDto.isResend()) {
-			userDtls = userService.getUserDtlsByPhone(loginRequestDto.getPhone());
+		userDtls = userService.getUserDtlsByPhone(loginRequestDto.getPhone());
+		if (userDtls != null) {
 			userDtls.setOtp(1234);
 			userDtls.setModifiedAt(LocalDateTime.now());
 			savedUser = userService.save(userDtls);
