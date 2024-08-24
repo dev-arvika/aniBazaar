@@ -1,8 +1,11 @@
 package com.ani.bazaar.entity;
 
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -31,6 +34,12 @@ public class AddressEntity {
     private String lat;
     
     private String lng;
+    
+    @Column(name = "created_at")
+	private LocalDateTime createdAt;
+
+	@Column(name = "modified_at")
+	private LocalDateTime modifiedAt;
 
     @OneToOne(fetch = FetchType.LAZY)
 	@JsonIgnore
