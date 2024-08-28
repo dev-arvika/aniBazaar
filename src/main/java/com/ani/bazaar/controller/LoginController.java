@@ -60,7 +60,7 @@ public class LoginController {
 			verifyResponseDto.setSlug("ram-0xkihcsi4e");
 			return new ResponseEntity<>(verifyResponseDto, HttpStatus.OK);
 		} else {
-			verifyResponseDto.setError("Unauthorised");
+			verifyResponseDto.setError("Unauthorized");
 			return new ResponseEntity<>(verifyResponseDto, HttpStatus.UNAUTHORIZED);
 		}
 
