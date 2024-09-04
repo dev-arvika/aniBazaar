@@ -12,5 +12,5 @@ public class VerifyResponseDto {
 	private String name;
 	private String slug;//"ram-0xkihcsi4e"
     private long userId; //15508285300
-    private String error;//"Unauthorised"
+    private String error;//"Unauthorized"
 }

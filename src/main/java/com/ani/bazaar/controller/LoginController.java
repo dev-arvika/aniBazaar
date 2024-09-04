@@ -54,7 +54,7 @@ public class LoginController {
 		VerifyResponseDto verifyResponseDto = new VerifyResponseDto();
 		if (userDtls != null) {
 			verifyResponseDto.setUserId(userDtls.getId());
-			verifyResponseDto.setName(userDtls.getUserName());
+			verifyResponseDto.setName(userDtls.getUserName() != null ? userDtls.getUserName() : "");
 			verifyResponseDto.setAccessToken("accessToken");
 			verifyResponseDto.setRefreshToken("refreshToken");
 			verifyResponseDto.setSlug("ram-0xkihcsi4e");
