@@ -8,5 +8,10 @@
     "name": "upload.max-size",
     "type": "java.lang.String",
     "description": "A description for 'upload.max-size'"
+  },
+  {
+    "name": "file.upload-dir",
+    "type": "java.lang.String",
+    "description": "A description for 'file.upload-dir'"
   }
 ]}

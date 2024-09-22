@@ -26,7 +26,7 @@ public class LoginController {
 	private ModelMapper modelMapper;
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
 
 	@PostMapping("/api/login")
 	public ResponseEntity<LoginResponseDto> saveUser(@Valid @RequestBody LoginRequestDto loginRequestDto) {
