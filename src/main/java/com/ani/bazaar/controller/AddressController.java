@@ -1,15 +1,10 @@
 package com.ani.bazaar.controller;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ani.bazaar.dto.AddressRequestDto;
 import com.ani.bazaar.dto.AddressResponseDto;
+import com.ani.bazaar.dto.AddressRequestDto;
 import com.ani.bazaar.entity.AddressEntity;
 import com.ani.bazaar.entity.UserEntity;
 import com.ani.bazaar.exception.AddressAlreadyExistException;
@@ -54,16 +49,14 @@ public class AddressController {
 	}
 
 	@GetMapping("api/users/{userid}/address/{id}")
-	public EntityModel<AddressEntity>  retriveAddressById(@PathVariable long userid, @PathVariable long id) {
+	public ResponseEntity<AddressResponseDto>  retriveAddressById(@PathVariable long userid, @PathVariable long id) {
 		AddressEntity address = addressRepository.findById(id);
 		if (address == null)
 			throw new AddressNotFoundException("Id: "+id);
 
-		EntityModel<AddressEntity> entityModel = EntityModel.of(address);
-		
-		WebMvcLinkBuilder link =  linkTo(methodOn(this.getClass()).retrieveAllAddresses());
-		entityModel.add(link.withRel("all-addresses"));
-		return entityModel;
+		AddressResponseDto addressResponseDto= new AddressResponseDto();
+		modelMapper.map(address, addressResponseDto);
+		return new ResponseEntity<>(addressResponseDto, HttpStatus.OK);
 	}
 	
 	@PostMapping("api/users/{userid}/address")

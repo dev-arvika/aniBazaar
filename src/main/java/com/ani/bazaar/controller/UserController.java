@@ -1,15 +1,13 @@
 package com.ani.bazaar.controller;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,16 +41,14 @@ public class UserController {
 	}
 
 	@GetMapping("/api/users/{id}")
-	public EntityModel<UserEntity>  retriveUserById(@PathVariable long id) {
+	public ResponseEntity<UserResponseDto>  retriveUserById(@PathVariable long id) {
 		UserEntity user = userRepository.findById(id);
 		if (user == null)
 			throw new UserNotFoundException("id: "+id);
 
-		EntityModel<UserEntity> entityModel = EntityModel.of(user);
-		
-		WebMvcLinkBuilder link =  linkTo(methodOn(this.getClass()).retrieveAllUsers());
-		entityModel.add(link.withRel("all-users"));
-		return entityModel;
+		UserResponseDto userResponseDto= new UserResponseDto();
+		modelMapper.map(user, userResponseDto);		
+		return new ResponseEntity<>(userResponseDto,HttpStatus.OK);
 	}
 
 	@PutMapping("/api/users/{id}")
