@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ani.bazaar.dto.PhotoResponseDto;
 import com.ani.bazaar.entity.UserEntity;
 import com.ani.bazaar.exception.UserNotFoundException;
 import com.ani.bazaar.repository.UserRepository;
@@ -17,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/api")
@@ -81,15 +83,15 @@ public class FileUploadController {
     }
 
     @GetMapping("/images/files/{filename}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String filename) {
+    public ResponseEntity<Object> getImage(@PathVariable String filename) {
         try {
             Path path = Paths.get(uploadDir, filename);
             byte[] imageBytes = Files.readAllBytes(path);
-            return ResponseEntity.ok()
-                    .contentType(org.springframework.http.MediaType.IMAGE_JPEG) // Set the media type as appropriate
-                    .body(imageBytes);
+            // Convert byte array to Base64
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+            return ResponseEntity.ok().body(new PhotoResponseDto(base64Image));
         } catch (IOException e) {
-            return ResponseEntity.status(404).body(null);
+            return ResponseEntity.status(404).body("Photo Not Found");
         }
     }
 }
