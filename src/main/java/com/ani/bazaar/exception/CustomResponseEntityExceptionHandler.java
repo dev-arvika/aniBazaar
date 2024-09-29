@@ -25,4 +25,9 @@ public class CustomResponseEntityExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("AddressAlreadyExist "+ex.getMessage());
     }
+    
+    @ExceptionHandler(value = { AnimalTypeNotFoundException.class})
+    public ResponseEntity<Object> animalTypeNotFoundException(Exception ex) {
+    	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("AnimalTypeNotFound "+ex.getMessage());
+    }
 }
