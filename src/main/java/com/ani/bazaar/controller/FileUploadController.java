@@ -87,6 +87,7 @@ public class FileUploadController {
         try {
             Path path = Paths.get(uploadDir, filename);
             byte[] imageBytes = Files.readAllBytes(path);
+            
             // Convert byte array to Base64
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
             return ResponseEntity.ok().body(new PhotoResponseDto(base64Image));

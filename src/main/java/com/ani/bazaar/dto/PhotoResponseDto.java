@@ -9,5 +9,6 @@ import lombok.Data;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PhotoResponseDto {
+	
 	private String photoFile;
 }
