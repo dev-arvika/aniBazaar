@@ -3,6 +3,7 @@ package com.ani.bazaar.entity;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -25,7 +26,7 @@ public class AddressEntity {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private long id;
     
     private String address;
     
@@ -41,8 +42,8 @@ public class AddressEntity {
 	@Column(name = "modified_at")
 	private LocalDateTime modifiedAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
-	@JsonIgnore
-	@JoinColumn(name = "user_details_id")
+    @OneToOne
+	@JoinColumn(name = "user_details_id", unique = true)
+    @JsonBackReference
 	private UserEntity userEntity;
 }

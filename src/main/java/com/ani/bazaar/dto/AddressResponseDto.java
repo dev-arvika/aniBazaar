@@ -11,5 +11,4 @@ public class AddressResponseDto {
     private String lat;
     private String lng;
     private Integer pincode;
-    private LocalDateTime modifiedAt;
 }
