@@ -1,17 +1,5 @@
 package com.ani.bazaar.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.ani.bazaar.dto.PhotoResponseDto;
-import com.ani.bazaar.entity.UserEntity;
-import com.ani.bazaar.exception.UserNotFoundException;
-import com.ani.bazaar.repository.UserRepository;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +7,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.ani.bazaar.entity.UserEntity;
+import com.ani.bazaar.exception.UserNotFoundException;
+import com.ani.bazaar.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api")
@@ -34,21 +39,21 @@ public class FileUploadController {
 	private UserRepository userRepository;
 	
     @PostMapping("users/{id}/images/upload")
-    public ResponseEntity<String> uploadImage(@PathVariable long id, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> uploadImage(@PathVariable long id, @RequestParam("file") MultipartFile file) {
     	UserEntity user = userRepository.findById(id);
 		if (user == null)
 			throw new UserNotFoundException("id: "+id);
-		
+       
         if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("File is empty");
+            return ResponseEntity.badRequest().body(Map.of("error", "File is empty"));
         }
         if (!file.getContentType().startsWith("image/")) {
-            return ResponseEntity.badRequest().body("File is not an image");
+            return ResponseEntity.badRequest().body(Map.of("error","File is not an image"));
         }
         // Check file size
         if (file.getSize() > maxSize) {
             return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
-                    .body("File size exceeds the maximum limit of 2 MB");
+                    .body(Map.of("error","File size exceeds the maximum limit of 2 MB"));
         }
         try {
             // Ensure the upload directory exists
@@ -76,9 +81,9 @@ public class FileUploadController {
             user.setUserPhoto(newFileName);
             user.setModifiedAt(LocalDateTime.now());
     		userRepository.save(user);
-            return ResponseEntity.ok("File uploaded successfully: " + newFileName);
+            return ResponseEntity.ok(Map.of("File uploaded successfully", newFileName));
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("File upload failed");
+            return ResponseEntity.status(500).body(Map.of("error","File upload failed"));
         }
     }
 
@@ -90,7 +95,7 @@ public class FileUploadController {
             
             // Convert byte array to Base64
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-            return ResponseEntity.ok().body(new PhotoResponseDto(base64Image));
+            return ResponseEntity.ok().body(Map.of("photoFile", base64Image));
         } catch (IOException e) {
             return ResponseEntity.status(404).body("Photo Not Found");
         }
