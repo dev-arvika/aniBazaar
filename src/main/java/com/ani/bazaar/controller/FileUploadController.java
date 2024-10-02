@@ -95,6 +95,7 @@ public class FileUploadController {
             
             // Convert byte array to Base64
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+            
             return ResponseEntity.ok().body(Map.of("photoFile", base64Image));
         } catch (IOException e) {
             return ResponseEntity.status(404).body("Photo Not Found");
