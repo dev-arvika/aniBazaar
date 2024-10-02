@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ani.bazaar.dto.UserRequestDto;
 import com.ani.bazaar.dto.UserResponseDto;
@@ -34,7 +34,7 @@ public class UserController {
 	
 	@Autowired
 	private UserRepository userRepository;
-
+	
 	@GetMapping("/api/users")
 	public List<UserEntity> retrieveAllUsers() {
 		return userRepository.findAll();
@@ -47,7 +47,13 @@ public class UserController {
 			throw new UserNotFoundException("id: "+id);
 
 		UserResponseDto userResponseDto= new UserResponseDto();
-		modelMapper.map(user, userResponseDto);		
+		modelMapper.map(user, userResponseDto);	
+		userResponseDto.setSelectLang(user.getSelectLang().getLanguage());
+		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/api/user-image/")
+                .path(user.getUserPhoto())
+                .toUriString();
+		userResponseDto.setUserPhoto(fileDownloadUri);
 		return new ResponseEntity<>(userResponseDto,HttpStatus.OK);
 	}
 
