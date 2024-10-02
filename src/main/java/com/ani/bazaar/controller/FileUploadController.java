@@ -8,10 +8,15 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ani.bazaar.entity.UserEntity;
 import com.ani.bazaar.exception.UserNotFoundException;
@@ -67,7 +73,11 @@ public class FileUploadController {
                 extension = file.getOriginalFilename().substring(lastDotIndex);
             }
             
-            String newFileName = "photo_"+id+extension;
+            long currentTimeMillis = System.currentTimeMillis();
+            int randomNumber = new Random().nextInt(1000); // random number up to 999
+            String uniqueId = currentTimeMillis + "-" + randomNumber;
+            
+            String newFileName = id+"_"+uniqueId+extension;
             // Define file path
             Path path = Paths.get(uploadDir, newFileName);
 
@@ -81,7 +91,16 @@ public class FileUploadController {
             user.setUserPhoto(newFileName);
             user.setModifiedAt(LocalDateTime.now());
     		userRepository.save(user);
-            return ResponseEntity.ok(Map.of("File uploaded successfully", newFileName));
+    		// Construct the URL for the uploaded file
+            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/api/user-image/")
+                .path(newFileName)
+                .toUriString();
+            
+            return ResponseEntity.ok(Map.of(
+            	    "message", "File uploaded successfully",
+            	    "userImage", fileDownloadUri
+            	));
         } catch (IOException e) {
             return ResponseEntity.status(500).body(Map.of("error","File upload failed"));
         }
@@ -100,5 +119,36 @@ public class FileUploadController {
         } catch (IOException e) {
             return ResponseEntity.status(404).body("Photo Not Found");
         }
+    }
+    
+    @GetMapping("/user-image/{filename:.+}")
+    public ResponseEntity<Resource> getProfileImage(@PathVariable String filename) {
+        Path filePath = Paths.get(uploadDir, filename);
+        File file = filePath.toFile();
+
+        if (!file.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource = new FileSystemResource(file);
+        
+        // Set content type based on file extension
+        String contentType = getContentType(filename);
+        
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
+
+    private String getContentType(String filename) {
+        if (filename.endsWith(".png")) {
+            return "image/png";
+        } else if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
+            return "image/jpeg";
+        } else if (filename.endsWith(".gif")) {
+            return "image/gif";
+        }
+        return "application/octet-stream"; // default type if unknown
     }
 }
