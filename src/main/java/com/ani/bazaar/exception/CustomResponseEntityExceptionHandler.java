@@ -30,4 +30,9 @@ public class CustomResponseEntityExceptionHandler {
     public ResponseEntity<Object> animalTypeNotFoundException(Exception ex) {
     	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("AnimalTypeNotFound "+ex.getMessage());
     }
+    
+	@ExceptionHandler(value = { AnimalBreedNotFoundException.class })
+	public ResponseEntity<Object> animalBreedNotFoundException(Exception ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("AnimalBreedNotFoundException " + ex.getMessage());
+	}
 }
