@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,6 +30,9 @@ import jakarta.validation.Valid;
 @RestController
 public class UserController {
 
+	@Value("${default.user.image}")
+    private String defaultUserImage;
+	
 	@Autowired
 	private ModelMapper modelMapper;
 	
@@ -51,9 +55,9 @@ public class UserController {
 		userResponseDto.setSelectLang(user.getSelectLang().getLanguage());
 		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/user-image/")
-                .path(user.getUserPhoto())
+                .path(user.getUserImage() !=null ? user.getUserImage() : defaultUserImage)
                 .toUriString();
-		userResponseDto.setUserPhoto(fileDownloadUri);
+		userResponseDto.setUserImage(fileDownloadUri);
 		return new ResponseEntity<>(userResponseDto,HttpStatus.OK);
 	}
 
@@ -63,11 +67,13 @@ public class UserController {
 		if (userDtls == null)
 			throw new UserNotFoundException("Id:"+id);
 		
+		userRequestDto.setPhone(userDtls.getPhone());
 		modelMapper.map(userRequestDto, userDtls);
 		userDtls.setModifiedAt(LocalDateTime.now());
-		userRepository.save(userDtls);
+		UserEntity savedUser = userRepository.save(userDtls);
 		UserResponseDto userResponseDto = new UserResponseDto();
-		modelMapper.map(userDtls, userResponseDto);
+		modelMapper.map(savedUser, userResponseDto);
+		userResponseDto.setSelectLang(savedUser.getSelectLang().getLanguage());
 		return new ResponseEntity<>(userResponseDto, HttpStatus.ACCEPTED);
 	}
 	

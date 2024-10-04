@@ -88,7 +88,7 @@ public class FileUploadController {
 
             // Save the file
             Files.copy(file.getInputStream(), path);
-            user.setUserPhoto(newFileName);
+            user.setUserImage(newFileName);
             user.setModifiedAt(LocalDateTime.now());
     		userRepository.save(user);
     		// Construct the URL for the uploaded file
