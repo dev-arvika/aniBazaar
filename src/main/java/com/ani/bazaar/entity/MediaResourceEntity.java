@@ -1,5 +1,7 @@
 package com.ani.bazaar.entity;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
@@ -16,18 +18,21 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "ANIMAL_BREED")
-public class AnimalBreedEntity {
+@Entity(name = "MEDIA_RESOURCES")
+public class MediaResourceEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-
+	
+	@Column(name= "media_path")
+	private String mediaPath;
+	
 	@ManyToOne
-	@JoinColumn(name = "animal_type_id")
+	@JoinColumn(name = "sale_post_id")
 	@JsonBackReference
-	private AnimalTypeEntity animalTypeEntity;
-
-	@Column(name = "animal_breed")
-	private String animalBreed;
+	private SalePostEntity salePostEntity;
+	
+	@Column(name= "created_at")
+	private LocalDateTime createdAt;
 }

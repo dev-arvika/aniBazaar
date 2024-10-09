@@ -30,6 +30,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.ani.bazaar.entity.UserEntity;
 import com.ani.bazaar.exception.UserNotFoundException;
 import com.ani.bazaar.repository.UserRepository;
+import com.ani.bazaar.utils.FileUploadUtil;
 
 @RestController
 @RequestMapping("/api")
@@ -37,6 +38,9 @@ public class FileUploadController {
 
 	@Value("${upload.dir}")
     private String uploadDir;
+	
+	@Value("${upload.dir-animal}")
+	private String aniUploadDir;
 
 	@Value("${upload.max-size}")
     private long maxSize; // Max file size in bytes
@@ -133,7 +137,54 @@ public class FileUploadController {
         Resource resource = new FileSystemResource(file);
         
         // Set content type based on file extension
-        String contentType = getContentType(filename);
+        String contentType = FileUploadUtil.getContentType(filename);
+        
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
+    
+    @PostMapping("/animal-image/{postid}/upload")
+	public ResponseEntity<Map<String, String>> uploadAnimalImage(@RequestParam("image") MultipartFile image) { 
+
+		if (image.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "File is empty"));
+        }
+        if (!image.getContentType().startsWith("image/")) {
+            return ResponseEntity.badRequest().body(Map.of("error","File is not an image"));
+        }
+        if (image.getSize() > maxSize) {
+            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                    .body(Map.of("error","File size exceeds the maximum limit of 2 MB"));
+        }
+
+		try {
+			String fileDownloadUri = FileUploadUtil.uploadAnimalImage(image, aniUploadDir, maxSize);
+			
+			 return ResponseEntity.ok(Map.of(
+	            	    "message", "File uploaded successfully",
+	            	    "userImage", fileDownloadUri
+	            	));
+			
+		} catch (IOException e) {
+			return ResponseEntity.status(500).body(Map.of("error","File upload failed"));
+		}
+	}
+    
+    @GetMapping("/animal-image/{filename:.+}")
+    public ResponseEntity<Resource> getAnimalImage(@PathVariable String filename) {
+        Path filePath = Paths.get(aniUploadDir, filename);
+        File file = filePath.toFile();
+
+        if (!file.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource = new FileSystemResource(file);
+        
+        // Set content type based on file extension
+        String contentType = FileUploadUtil.getContentType(filename);
         
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
@@ -141,14 +192,5 @@ public class FileUploadController {
                 .body(resource);
     }
 
-    private String getContentType(String filename) {
-        if (filename.endsWith(".png")) {
-            return "image/png";
-        } else if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
-            return "image/jpeg";
-        } else if (filename.endsWith(".gif")) {
-            return "image/gif";
-        }
-        return "application/octet-stream"; // default type if unknown
-    }
+    
 }

@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class AnimalBreedRequestDto {
 
-	private int animalTypeId;
+	private long animalTypeId;
 	private String animalBreed;
 }

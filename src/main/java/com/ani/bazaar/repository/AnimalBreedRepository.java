@@ -9,7 +9,7 @@ import jakarta.transaction.Transactional;
 @Transactional
 public interface AnimalBreedRepository extends JpaRepository<AnimalBreedEntity, Integer> {
 
-	AnimalBreedEntity findById(int id);
+	AnimalBreedEntity findById(long id);
 
-	void deleteAnimalBreedEntityById(int id);
+	void deleteAnimalBreedEntityById(long id);
 }
