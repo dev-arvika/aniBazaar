@@ -74,5 +74,5 @@ public class UserEntity {
 	
 	@OneToMany(mappedBy = "userEntity",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonManagedReference
-	private List<SalePostEntity> salePostEntity;
+	private List<AnimalSaleEntity> animalSaleEntities;
 }

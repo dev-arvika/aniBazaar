@@ -23,8 +23,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity( name = "SALES_POSTS")
-public class SalePostEntity {
+@Entity( name = "ANIMAL_SALE")
+public class AnimalSaleEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -70,7 +70,7 @@ public class SalePostEntity {
 	@Column(name = "selling_price")
 	private int sellingPrice;
 	
-	@OneToMany(mappedBy = "salePostEntity",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "animalSaleEntity",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JsonManagedReference
 	private List<MediaResourceEntity> mediaResourceEntity;
 	

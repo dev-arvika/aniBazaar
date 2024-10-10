@@ -29,9 +29,9 @@ public class MediaResourceEntity {
 	private String mediaPath;
 	
 	@ManyToOne
-	@JoinColumn(name = "sale_post_id")
+	@JoinColumn(name = "animal_sale_id")
 	@JsonBackReference
-	private SalePostEntity salePostEntity;
+	private AnimalSaleEntity animalSaleEntity;
 	
 	@Column(name= "created_at")
 	private LocalDateTime createdAt;

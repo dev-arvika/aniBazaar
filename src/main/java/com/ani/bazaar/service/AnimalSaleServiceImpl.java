@@ -8,30 +8,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ani.bazaar.dto.SalePostResponseDto;
-import com.ani.bazaar.entity.SalePostEntity;
-import com.ani.bazaar.repository.SalePostRepository;
+import com.ani.bazaar.entity.AnimalSaleEntity;
+import com.ani.bazaar.repository.AnimalSaleRepository;
 
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
-public class SalePostServiceImpl implements SalePostService {
+public class AnimalSaleServiceImpl implements AnimalSaleService {
 
 	@Autowired
-	SalePostRepository salePostRepository;
+	AnimalSaleRepository animalSaleRepository;
 
 	@Autowired
 	ModelMapper modelMapper;
 
 	@Override
-	public SalePostEntity save(SalePostEntity salePostEntity) {
-		return salePostRepository.save(salePostEntity);
+	public AnimalSaleEntity save(AnimalSaleEntity animalSaleEntity) {
+		return animalSaleRepository.save(animalSaleEntity);
 	}
 
 	@Override
-	public List<SalePostResponseDto> getAllSalePost() {
-		List<SalePostEntity> saleposts = salePostRepository.findAll();
+	public List<SalePostResponseDto> getAllAnimal() {
+		List<AnimalSaleEntity> saleposts = animalSaleRepository.findAll();
 		return saleposts.stream().map(salepost -> modelMapper.map(salepost, SalePostResponseDto.class))
 								.collect(Collectors.toList());
 	}
