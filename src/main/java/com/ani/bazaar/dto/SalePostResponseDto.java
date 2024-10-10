@@ -44,7 +44,6 @@ public class SalePostResponseDto {
 		String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/animal-image/").toUriString();
 		return mediaResourceEntity.stream().map(media -> baseUrl + media.getMediaPath()) // prepend the base URL
 				.collect(Collectors.joining(", "));
-
 	}
 
 }
