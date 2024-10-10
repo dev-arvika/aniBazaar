@@ -15,8 +15,6 @@ import lombok.Data;
 @Data
 public class SalePostResponseDto {
 
-	@JsonIgnore
-	private long id;
 	private int lactation;
 	private int litersOfMilkDaily;
 	private int milkCapacity;
@@ -35,17 +33,15 @@ public class SalePostResponseDto {
 	@JsonIgnore
 	private String animalImage;
 
-	public String getAnimalImages() {	// custom method to retrieve image paths 
+	public String getAnimalImages() { // custom method to retrieve image paths
 		if (mediaResourceEntity == null || mediaResourceEntity.isEmpty()) {
-			if(animalImage.isEmpty()) {	// if resource entity not fetched, return from animalImage string
+			if (animalImage.isEmpty()) { // if resource entity not fetched, return from animalImage string
 				return "";
-			}
-			else {
+			} else {
 				return this.getAnimalImage();
 			}
 		}
-		String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/api/salepost/" + this.getId() + "/images/").toUriString();
+		String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/animal-image/").toUriString();
 		return mediaResourceEntity.stream().map(media -> baseUrl + media.getMediaPath()) // prepend the base URL
 				.collect(Collectors.joining(", "));
 
