@@ -35,4 +35,14 @@ public class CustomResponseEntityExceptionHandler {
 	public ResponseEntity<Object> animalBreedNotFoundException(Exception ex) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("AnimalBreedNotFoundException " + ex.getMessage());
 	}
+	
+	@ExceptionHandler(value = { SalePostNotFoundExeption.class })
+	public ResponseEntity<Object> SalePostNotFoundExeption(Exception ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("SalePostNotFoundExeption " + ex.getMessage());
+	}
+	
+	@ExceptionHandler(value = { MediaResourceNotFoundException.class })
+	public ResponseEntity<Object> MediaResourceNotFoundException(Exception ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("MediaResourceNotFoundException " + ex.getMessage());
+	}
 }

@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class AnimalTypeEntity {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;	
+	private long id;	
 	
 	@Column(name="animal_type")
 	private String animalType;
@@ -36,4 +36,8 @@ public class AnimalTypeEntity {
 	@OneToMany(mappedBy = "animalTypeEntity",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonManagedReference
 	private List<AnimalBreedEntity> animalBreedEntity;
+	
+	@OneToMany(mappedBy = "animalTypeEntity",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonManagedReference
+	private List<AnimalSaleEntity> animalSaleEntities;
 }

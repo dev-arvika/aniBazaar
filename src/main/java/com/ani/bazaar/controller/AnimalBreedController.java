@@ -42,7 +42,7 @@ public class AnimalBreedController {
 	AnimalTypeRepository animalTypeRepository;
 
 	@GetMapping("api/animal/breed/{id}")
-	public ResponseEntity<AnimalBreedResponseDto> retriveAnimalBreedById(@PathVariable int id) {
+	public ResponseEntity<AnimalBreedResponseDto> retriveAnimalBreedById(@PathVariable long id) {
 		AnimalBreedEntity animalBreedEntity = animalBreedRepository.findById(id);
 		if (animalBreedEntity == null)
 			throw new AnimalBreedNotFoundException("Id:" + id);
@@ -59,7 +59,7 @@ public class AnimalBreedController {
 	}
 
 	@PostMapping("api/animal/{id}/breed")
-	public ResponseEntity<AnimalBreedResponseDto> saveAnimalBreed(@Valid @PathVariable int id,
+	public ResponseEntity<AnimalBreedResponseDto> saveAnimalBreed(@Valid @PathVariable long id,
 			@RequestBody AnimalBreedRequestDto animalBreedRequestDto) {
 
 		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findById(id);
@@ -78,7 +78,7 @@ public class AnimalBreedController {
 	}
 
 	@PutMapping("api/animal/breed/{id}")
-	public ResponseEntity<AnimalBreedResponseDto> updateAnimalBreed(@Valid @PathVariable int id,
+	public ResponseEntity<AnimalBreedResponseDto> updateAnimalBreed(@Valid @PathVariable long id,
 			@RequestBody AnimalBreedRequestDto animalBreedRequestDto) {
 		AnimalBreedEntity animalBreedDtls = animalBreedRepository.findById(id);
 		if (animalBreedDtls == null)
@@ -92,7 +92,7 @@ public class AnimalBreedController {
 	}
 
 	@DeleteMapping("api/animal/breed/{id}")
-	public ResponseEntity<String> deleteAnimalBreed(@PathVariable int id) {
+	public ResponseEntity<String> deleteAnimalBreed(@PathVariable long id) {
 		AnimalBreedEntity animalBreedEntity = animalBreedRepository.findById(id);
 		if (animalBreedEntity == null)
 			throw new AnimalTypeNotFoundException("Id:" + id);

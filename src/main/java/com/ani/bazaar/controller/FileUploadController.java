@@ -30,125 +30,157 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.ani.bazaar.entity.UserEntity;
 import com.ani.bazaar.exception.UserNotFoundException;
 import com.ani.bazaar.repository.UserRepository;
+import com.ani.bazaar.utils.FileUploadUtils;
 
 @RestController
 @RequestMapping("/api")
 public class FileUploadController {
 
 	@Value("${upload.dir}")
-    private String uploadDir;
+	private String uploadDir;
+
+	@Value("${upload.dir-animal}")
+	private String aniUploadDir;
 
 	@Value("${upload.max-size}")
-    private long maxSize; // Max file size in bytes
-	
+	private long maxSize; // Max file size in bytes
+
 	@Autowired
 	private UserRepository userRepository;
-	
-    @PostMapping("users/{id}/images/upload")
-    public ResponseEntity<Map<String, String>> uploadImage(@PathVariable long id, @RequestParam("file") MultipartFile file) {
-    	UserEntity user = userRepository.findById(id);
+
+	@PostMapping("users/{id}/images/upload")
+	public ResponseEntity<Map<String, String>> uploadImage(@PathVariable long id,
+			@RequestParam("file") MultipartFile file) {
+		UserEntity user = userRepository.findById(id);
 		if (user == null)
-			throw new UserNotFoundException("id: "+id);
-       
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "File is empty"));
-        }
-        if (!file.getContentType().startsWith("image/")) {
-            return ResponseEntity.badRequest().body(Map.of("error","File is not an image"));
-        }
-        // Check file size
-        if (file.getSize() > maxSize) {
-            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
-                    .body(Map.of("error","File size exceeds the maximum limit of 2 MB"));
-        }
-        try {
-            // Ensure the upload directory exists
-            File directory = new File(uploadDir);
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-            String extension = "";
-            int lastDotIndex = file.getOriginalFilename().lastIndexOf('.');
-            if (lastDotIndex > 0) {
-                extension = file.getOriginalFilename().substring(lastDotIndex);
-            }
-            
-            long currentTimeMillis = System.currentTimeMillis();
-            int randomNumber = new Random().nextInt(1000); // random number up to 999
-            String uniqueId = currentTimeMillis + "-" + randomNumber;
-            
-            String newFileName = id+"_"+uniqueId+extension;
-            // Define file path
-            Path path = Paths.get(uploadDir, newFileName);
+			throw new UserNotFoundException("id: " + id);
 
-            // Check if file already exists and delete it if necessary
-            if (Files.exists(path)) {
-                Files.delete(path);
-            }
+		if (file.isEmpty()) {
+			return ResponseEntity.badRequest().body(Map.of("error", "File is empty"));
+		}
+		if (!file.getContentType().startsWith("image/")) {
+			return ResponseEntity.badRequest().body(Map.of("error", "File is not an image"));
+		}
+		// Check file size
+		if (file.getSize() > maxSize) {
+			return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+					.body(Map.of("error", "File size exceeds the maximum limit of 2 MB"));
+		}
+		try {
+			// Ensure the upload directory exists
+			File directory = new File(uploadDir);
+			if (!directory.exists()) {
+				directory.mkdirs();
+			}
+			String extension = "";
+			int lastDotIndex = file.getOriginalFilename().lastIndexOf('.');
+			if (lastDotIndex > 0) {
+				extension = file.getOriginalFilename().substring(lastDotIndex);
+			}
 
-            // Save the file
-            Files.copy(file.getInputStream(), path);
-            user.setUserImage(newFileName);
-            user.setModifiedAt(LocalDateTime.now());
-    		userRepository.save(user);
-    		// Construct the URL for the uploaded file
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/user-image/")
-                .path(newFileName)
-                .toUriString();
-            
-            return ResponseEntity.ok(Map.of(
-            	    "message", "File uploaded successfully",
-            	    "userImage", fileDownloadUri
-            	));
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body(Map.of("error","File upload failed"));
-        }
-    }
+			long currentTimeMillis = System.currentTimeMillis();
+			int randomNumber = new Random().nextInt(1000); // random number up to 999
+			String uniqueId = currentTimeMillis + "-" + randomNumber;
 
-    @GetMapping("/images/files/{filename}")
-    public ResponseEntity<Object> getImage(@PathVariable String filename) {
-        try {
-            Path path = Paths.get(uploadDir, filename);
-            byte[] imageBytes = Files.readAllBytes(path);
-            
-            // Convert byte array to Base64
-            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-            
-            return ResponseEntity.ok().body(Map.of("photoFile", base64Image));
-        } catch (IOException e) {
-            return ResponseEntity.status(404).body("Photo Not Found");
-        }
-    }
-    
-    @GetMapping("/user-image/{filename:.+}")
-    public ResponseEntity<Resource> getProfileImage(@PathVariable String filename) {
-        Path filePath = Paths.get(uploadDir, filename);
-        File file = filePath.toFile();
+			String newFileName = id + "_" + uniqueId + extension;
+			// Define file path
+			Path path = Paths.get(uploadDir, newFileName);
 
-        if (!file.exists()) {
-            return ResponseEntity.notFound().build();
-        }
+			// Check if file already exists and delete it if necessary
+			if (Files.exists(path)) {
+				Files.delete(path);
+			}
 
-        Resource resource = new FileSystemResource(file);
-        
-        // Set content type based on file extension
-        String contentType = getContentType(filename);
-        
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
-    }
+			// Save the file
+			Files.copy(file.getInputStream(), path);
+			user.setUserPhoto(newFileName);
+			user.setModifiedAt(LocalDateTime.now());
+			userRepository.save(user);
+			// Construct the URL for the uploaded file
+			String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user-image/")
+					.path(newFileName).toUriString();
 
-    private String getContentType(String filename) {
-        if (filename.endsWith(".png")) {
-            return "image/png";
-        } else if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
-            return "image/jpeg";
-        } else if (filename.endsWith(".gif")) {
-            return "image/gif";
-        }
-        return "application/octet-stream"; // default type if unknown
-    }
+			return ResponseEntity.ok(Map.of("message", "File uploaded successfully", "userImage", fileDownloadUri));
+		} catch (IOException e) {
+			return ResponseEntity.status(500).body(Map.of("error", "File upload failed"));
+		}
+	}
+
+	@GetMapping("/images/files/{filename}")
+	public ResponseEntity<Object> getImage(@PathVariable String filename) {
+		try {
+			Path path = Paths.get(uploadDir, filename);
+			byte[] imageBytes = Files.readAllBytes(path);
+
+			// Convert byte array to Base64
+			String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+			return ResponseEntity.ok().body(Map.of("photoFile", base64Image));
+		} catch (IOException e) {
+			return ResponseEntity.status(404).body("Photo Not Found");
+		}
+	}
+
+	@GetMapping("/user-image/{filename:.+}")
+	public ResponseEntity<Resource> getProfileImage(@PathVariable String filename) {
+		Path filePath = Paths.get(uploadDir, filename);
+		File file = filePath.toFile();
+
+		if (!file.exists()) {
+			return ResponseEntity.notFound().build();
+		}
+
+		Resource resource = new FileSystemResource(file);
+
+		// Set content type based on file extension
+		String contentType = FileUploadUtils.getContentType(filename);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+				.body(resource);
+	}
+
+	@PostMapping("/animal-image/upload")
+	public ResponseEntity<Map<String, String>> uploadAnimalImage(@RequestParam("image") MultipartFile image) {
+
+		if (image.isEmpty()) {
+			return ResponseEntity.badRequest().body(Map.of("error", "File is empty"));
+		}
+		if (!image.getContentType().startsWith("image/")) {
+			return ResponseEntity.badRequest().body(Map.of("error", "File is not an image"));
+		}
+		if (image.getSize() > maxSize) {
+			return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+					.body(Map.of("error", "File size exceeds the maximum limit of 2 MB"));
+		}
+
+		try {
+			String fileDownloadUri = FileUploadUtils.uploadAnimalImage(image, aniUploadDir, maxSize);
+
+			return ResponseEntity.ok(Map.of("message", "File uploaded successfully", "animalImage", fileDownloadUri));
+
+		} catch (IOException e) {
+			return ResponseEntity.status(500).body(Map.of("error", "File upload failed"));
+		}
+	}
+
+	@GetMapping("/animal-image/{filename:.+}")
+	public ResponseEntity<Resource> getAnimalImage(@PathVariable String filename) {
+		Path filePath = Paths.get(aniUploadDir, filename);
+		File file = filePath.toFile();
+
+		if (!file.exists()) {
+			return ResponseEntity.notFound().build();
+		}
+
+		Resource resource = new FileSystemResource(file);
+
+		// Set content type based on file extension
+		String contentType = FileUploadUtils.getContentType(filename);
+
+		return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+				.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+				.body(resource);
+	}
+
 }

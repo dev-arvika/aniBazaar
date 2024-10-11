@@ -35,7 +35,7 @@ public class AnimalTypeController {
 	AnimalTypeRepository animalTypeRepository;
 
 	@GetMapping("api/animal/type/{id}")
-	public ResponseEntity<AnimalTypeResponseDto> retriveAnimalTypeById(@PathVariable int id) {
+	public ResponseEntity<AnimalTypeResponseDto> retriveAnimalTypeById(@PathVariable long id) {
 		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findById(id);
 		if (animalTypeEntity == null)
 			throw new AnimalTypeNotFoundException("Id:" + id);
@@ -66,7 +66,7 @@ public class AnimalTypeController {
 	}
 
 	@PutMapping("api/animal/type/{id}")
-	public ResponseEntity<AnimalTypeResponseDto> updateAnimalType(@Valid @PathVariable int id,
+	public ResponseEntity<AnimalTypeResponseDto> updateAnimalType(@Valid @PathVariable long id,
 			@RequestBody AnimalTypeRequestDto animalTypeRequestDto) {
 		AnimalTypeEntity animalTypeDtls = animalTypeRepository.findById(id);
 		if (animalTypeDtls == null)
@@ -80,7 +80,7 @@ public class AnimalTypeController {
 	}
 
 	@DeleteMapping("api/animal/type/{id}")
-	public ResponseEntity<String> deleteAnimalType(@PathVariable int id) {
+	public ResponseEntity<String> deleteAnimalType(@PathVariable long id) {
 		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findById(id);
 		if (animalTypeEntity == null)
 			throw new AnimalTypeNotFoundException("Id:" + id);
