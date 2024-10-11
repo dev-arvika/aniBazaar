@@ -182,4 +182,5 @@ public class FileUploadController {
 				.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
 				.body(resource);
 	}
+
 }

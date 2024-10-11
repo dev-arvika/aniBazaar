@@ -49,8 +49,8 @@ public class UserEntity {
 	@Column(name = "device_token")
 	private String deviceToken;
 
-	@Column(name = "user_photo")
-	private String userPhoto;
+	@Column(name = "user_image")
+	private String userImage;
 
 	private Integer otp;
 	
