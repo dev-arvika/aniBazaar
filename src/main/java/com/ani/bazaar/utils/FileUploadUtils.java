@@ -10,7 +10,7 @@ import java.util.Random;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-public class FileUploadUtil {
+public class FileUploadUtils {
 
 	public static String uploadAnimalImage(MultipartFile image, String uploadDir, long maxSize) throws IOException {
 

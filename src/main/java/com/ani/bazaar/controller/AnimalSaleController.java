@@ -55,6 +55,23 @@ public class AnimalSaleController {
 	@Autowired
 	ModelMapper modelMapper;
 
+	@GetMapping("/animal/sales")
+	public ResponseEntity<List<SalePostResponseDto>> getAllAnimal() {
+		List<SalePostResponseDto> saleposts = animalSaleService.getAllAnimal();
+		return new ResponseEntity<>(saleposts, HttpStatus.OK);
+	}
+	
+	@GetMapping("/animal/sale/{id}")
+	public ResponseEntity<SalePostResponseDto> getAnimalById(@PathVariable long id) {
+		AnimalSaleEntity animalSaleEntity = animalSaleRepository.findById(id);
+		if (animalSaleEntity == null)
+			throw new SalePostNotFoundExeption("Id:" + id);
+
+		SalePostResponseDto salePostResponseDto = new SalePostResponseDto();
+		modelMapper.map(animalSaleEntity, salePostResponseDto);
+		return new ResponseEntity<>(salePostResponseDto, HttpStatus.OK);
+	}
+	
 	@PostMapping("/users/{userid}/animal-sale")
 	public ResponseEntity<SalePostResponseDto> saveSalePost(@Valid @PathVariable("userid") long userId,
 			@RequestBody SalePostRequestDto salePostRequestDto) {
@@ -92,23 +109,6 @@ public class AnimalSaleController {
 		salePostResponseDto.setAnimalImage(animalImageUri);
 		System.out.println("animalImages" + salePostResponseDto.getAnimalImages());
 		return new ResponseEntity<>(salePostResponseDto, HttpStatus.CREATED);
-	}
-
-	@GetMapping("/animal/sale/{id}")
-	public ResponseEntity<SalePostResponseDto> getAnimalById(@PathVariable long id) {
-		AnimalSaleEntity animalSaleEntity = animalSaleRepository.findById(id);
-		if (animalSaleEntity == null)
-			throw new SalePostNotFoundExeption("Id:" + id);
-
-		SalePostResponseDto salePostResponseDto = new SalePostResponseDto();
-		modelMapper.map(animalSaleEntity, salePostResponseDto);
-		return new ResponseEntity<>(salePostResponseDto, HttpStatus.OK);
-	}
-
-	@GetMapping("/animal/sales")
-	public ResponseEntity<List<SalePostResponseDto>> getAllAnimal() {
-		List<SalePostResponseDto> saleposts = animalSaleService.getAllAnimal();
-		return new ResponseEntity<>(saleposts, HttpStatus.OK);
 	}
 
 	@PutMapping("user/{userid}/animal-sale/{postid}")
