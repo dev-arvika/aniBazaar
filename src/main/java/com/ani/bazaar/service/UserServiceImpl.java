@@ -47,10 +47,10 @@ public class UserServiceImpl implements UserService {
 		UserEntity existingUser = optionalUser.orElseThrow(() -> new UserNotFoundException("Id:"+userId));
 
         // Check and update fields if they are different
-        if (userRequestDto.getUserName() != null && !userRequestDto.getUserName().equals(existingUser.getUserName())) {
+        if (userRequestDto.getUserName() != null && userRequestDto.getUserName().isBlank() && !userRequestDto.getUserName().equals(existingUser.getUserName())) {
             existingUser.setUserName(userRequestDto.getUserName());
         }
-        if (userRequestDto.getEmail() != null && !userRequestDto.getEmail().equals(existingUser.getEmail())) {
+        if (userRequestDto.getEmail() != null && !userRequestDto.getEmail().isBlank() && !userRequestDto.getEmail().equals(existingUser.getEmail())) {
             existingUser.setEmail(userRequestDto.getEmail());
         }
         if (userRequestDto.getPhone() != null && !userRequestDto.getPhone().equals(existingUser.getPhone())) {
@@ -59,13 +59,13 @@ public class UserServiceImpl implements UserService {
         if (userRequestDto.getWaPhone() != null && !userRequestDto.getWaPhone().equals(existingUser.getWaPhone())) {
             existingUser.setWaPhone(userRequestDto.getWaPhone());
         }
-        if (userRequestDto.getWork() != null && !userRequestDto.getWork().equals(existingUser.getWork())) {
+        if (userRequestDto.getWork() != null && !userRequestDto.getWork().isBlank() && !userRequestDto.getWork().equals(existingUser.getWork())) {
             existingUser.setWork(userRequestDto.getWork());
         }
-        if (userRequestDto.getDob() != null && !userRequestDto.getDob().equals(existingUser.getDob().format(formatter))) {
+        if (userRequestDto.getDob() != null && !userRequestDto.getDob().isBlank() && !userRequestDto.getDob().equals(existingUser.getDob().format(formatter))) {
             existingUser.setDob(LocalDate.parse(userRequestDto.getDob(), formatter));
         }
-        if (userRequestDto.getSelectLang() != null && !userRequestDto.getSelectLang().equals(existingUser.getSelectLang().getLanguage())) {
+        if (userRequestDto.getSelectLang() != null && !userRequestDto.getSelectLang().isBlank() && !userRequestDto.getSelectLang().equals(existingUser.getSelectLang().getLanguage())) {
         	LanguageEntity languageEntity = languageRepository.findByLanguage(userRequestDto.getSelectLang());
             existingUser.setSelectLang(languageEntity);
         }
