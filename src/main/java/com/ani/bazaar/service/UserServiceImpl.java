@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 		UserEntity existingUser = optionalUser.orElseThrow(() -> new UserNotFoundException("Id:"+userId));
 
         // Check and update fields if they are different
-        if (userRequestDto.getUserName() != null && userRequestDto.getUserName().isBlank() && !userRequestDto.getUserName().equals(existingUser.getUserName())) {
+        if (userRequestDto.getUserName() != null && !userRequestDto.getUserName().isBlank() && !userRequestDto.getUserName().equals(existingUser.getUserName())) {
             existingUser.setUserName(userRequestDto.getUserName());
         }
         if (userRequestDto.getEmail() != null && !userRequestDto.getEmail().isBlank() && !userRequestDto.getEmail().equals(existingUser.getEmail())) {
