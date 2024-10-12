@@ -2,14 +2,13 @@ package com.ani.bazaar.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.Map;
-import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.ani.bazaar.entity.UserEntity;
 import com.ani.bazaar.exception.UserNotFoundException;
@@ -47,7 +45,9 @@ public class FileUploadController {
 
 	@Autowired
 	private UserRepository userRepository;
-
+ 
+	private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
+	
 	@PostMapping("users/{id}/images/upload")
 	public ResponseEntity<Map<String, String>> uploadImage(@PathVariable long id,
 			@RequestParam("file") MultipartFile file) {
@@ -67,57 +67,17 @@ public class FileUploadController {
 					.body(Map.of("error", "File size exceeds the maximum limit of 2 MB"));
 		}
 		try {
-			// Ensure the upload directory exists
-			File directory = new File(uploadDir);
-			if (!directory.exists()) {
-				directory.mkdirs();
-			}
-			String extension = "";
-			int lastDotIndex = file.getOriginalFilename().lastIndexOf('.');
-			if (lastDotIndex > 0) {
-				extension = file.getOriginalFilename().substring(lastDotIndex);
-			}
-
-			long currentTimeMillis = System.currentTimeMillis();
-			int randomNumber = new Random().nextInt(1000); // random number up to 999
-			String uniqueId = currentTimeMillis + "-" + randomNumber;
-
-			String newFileName = id + "_" + uniqueId + extension;
-			// Define file path
-			Path path = Paths.get(uploadDir, newFileName);
-
-			// Check if file already exists and delete it if necessary
-			if (Files.exists(path)) {
-				Files.delete(path);
-			}
-
-			// Save the file
-			Files.copy(file.getInputStream(), path);
-			user.setUserImage(newFileName);
+			String oldImage = user.getUserImage();
+			String uploadedFileName = FileUploadUtils.uploadImage(file, uploadDir, id);
+			user.setUserImage(uploadedFileName);
 			user.setModifiedAt(LocalDateTime.now());
 			userRepository.save(user);
 			// Construct the URL for the uploaded file
-			String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user-image/")
-					.path(newFileName).toUriString();
-
+			String fileDownloadUri = FileUploadUtils.getImageDownloadUri(uploadedFileName, "/api/user-image/");
+			deleteImageFile(oldImage, uploadDir);
 			return ResponseEntity.ok(Map.of("message", "File uploaded successfully", "userImage", fileDownloadUri));
 		} catch (IOException e) {
 			return ResponseEntity.status(500).body(Map.of("error", "File upload failed"));
-		}
-	}
-
-	@GetMapping("/images/files/{filename}")
-	public ResponseEntity<Object> getImage(@PathVariable String filename) {
-		try {
-			Path path = Paths.get(uploadDir, filename);
-			byte[] imageBytes = Files.readAllBytes(path);
-
-			// Convert byte array to Base64
-			String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-
-			return ResponseEntity.ok().body(Map.of("photoFile", base64Image));
-		} catch (IOException e) {
-			return ResponseEntity.status(404).body("Photo Not Found");
 		}
 	}
 
@@ -155,10 +115,10 @@ public class FileUploadController {
 		}
 
 		try {
-			String fileDownloadUri = FileUploadUtils.uploadAnimalImage(image, aniUploadDir, maxSize);
+			String uploadedFileName = FileUploadUtils.uploadImage(image, aniUploadDir, 0);
+			String fileDownloadUri = FileUploadUtils.getImageDownloadUri(uploadedFileName, "/api/animal-image/");
 
 			return ResponseEntity.ok(Map.of("message", "File uploaded successfully", "animalImage", fileDownloadUri));
-
 		} catch (IOException e) {
 			return ResponseEntity.status(500).body(Map.of("error", "File upload failed"));
 		}
@@ -183,4 +143,24 @@ public class FileUploadController {
 				.body(resource);
 	}
 
+	private void deleteImageFile(String filename, String imageUploadDir) {
+        File file = new File(imageUploadDir + File.separator + filename);
+        if (file.exists() && file.delete()) {
+        	logger.info("Deleted file: {}", filename);
+        } else {
+        	logger.warn("File does not exist or could not be deleted: {}", filename);
+        }
+    }
+	/*
+	 * @GetMapping("/images/files/{filename}") public ResponseEntity<Object>
+	 * getImage(@PathVariable String filename) { try { Path path =
+	 * Paths.get(uploadDir, filename); byte[] imageBytes = Files.readAllBytes(path);
+	 * 
+	 * // Convert byte array to Base64 String base64Image =
+	 * Base64.getEncoder().encodeToString(imageBytes);
+	 * 
+	 * return ResponseEntity.ok().body(Map.of("photoFile", base64Image)); } catch
+	 * (IOException e) { return ResponseEntity.status(404).body("Photo Not Found");
+	 * } }
+	 */
 }

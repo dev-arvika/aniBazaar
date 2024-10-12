@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.ani.bazaar.entity.AddressEntity;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 
 @Transactional
 public interface AddressRepository extends JpaRepository<AddressEntity, Long> {

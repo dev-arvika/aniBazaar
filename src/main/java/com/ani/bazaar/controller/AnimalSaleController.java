@@ -18,17 +18,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.ani.bazaar.dto.SalePostRequestDto;
-import com.ani.bazaar.dto.SalePostResponseDto;
+import com.ani.bazaar.dto.AnimalSaleRequestDto;
+import com.ani.bazaar.dto.AnimalSaleResponseDto;
+import com.ani.bazaar.entity.AnimalSaleEntity;
 import com.ani.bazaar.entity.AnimalTypeEntity;
 import com.ani.bazaar.entity.MediaResourceEntity;
-import com.ani.bazaar.entity.AnimalSaleEntity;
 import com.ani.bazaar.entity.UserEntity;
 import com.ani.bazaar.exception.SalePostNotFoundExeption;
 import com.ani.bazaar.exception.UserNotFoundException;
+import com.ani.bazaar.repository.AnimalSaleRepository;
 import com.ani.bazaar.repository.AnimalTypeRepository;
 import com.ani.bazaar.repository.MediaResourceRepository;
-import com.ani.bazaar.repository.AnimalSaleRepository;
 import com.ani.bazaar.repository.UserRepository;
 import com.ani.bazaar.service.AnimalSaleService;
 
@@ -56,44 +56,49 @@ public class AnimalSaleController {
 	ModelMapper modelMapper;
 
 	@GetMapping("/animal/sales")
-	public ResponseEntity<List<SalePostResponseDto>> getAllAnimal() {
-		List<SalePostResponseDto> saleposts = animalSaleService.getAllAnimal();
-		return new ResponseEntity<>(saleposts, HttpStatus.OK);
+	public ResponseEntity<List<AnimalSaleResponseDto>> getAllAnimal() {
+		List<AnimalSaleResponseDto> animalSaleResponseDto = animalSaleService.getAllAnimal();
+		return new ResponseEntity<>(animalSaleResponseDto, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/animal/sale/{id}")
-	public ResponseEntity<SalePostResponseDto> getAnimalById(@PathVariable long id) {
+	public ResponseEntity<AnimalSaleResponseDto> getAnimalById(@PathVariable long id) {
 		AnimalSaleEntity animalSaleEntity = animalSaleRepository.findById(id);
 		if (animalSaleEntity == null)
 			throw new SalePostNotFoundExeption("Id:" + id);
 
-		SalePostResponseDto salePostResponseDto = new SalePostResponseDto();
-		modelMapper.map(animalSaleEntity, salePostResponseDto);
-		return new ResponseEntity<>(salePostResponseDto, HttpStatus.OK);
+		AnimalSaleResponseDto animalSaleResponseDto = new AnimalSaleResponseDto();
+		modelMapper.map(animalSaleEntity, animalSaleResponseDto);
+		return new ResponseEntity<>(animalSaleResponseDto, HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/users/{userid}/animal-sale")
-	public ResponseEntity<SalePostResponseDto> saveSalePost(@Valid @PathVariable("userid") long userId,
-			@RequestBody SalePostRequestDto salePostRequestDto) {
+	public ResponseEntity<AnimalSaleResponseDto> saveSalePost(@Valid @PathVariable("userid") long userId,
+			@RequestBody AnimalSaleRequestDto animalSaleRequestDto) {
 		UserEntity userDtls = userRepository.findById(userId);
 		if (userDtls == null)
 			throw new UserNotFoundException("Id:" + userId);
-		String[] animalImages = salePostRequestDto.getAnimalImages().split(",");
+
+		String[] animalImages = (animalSaleRequestDto.getAnimalImages() != null
+				&& !animalSaleRequestDto.getAnimalImages().isBlank())
+						? animalSaleRequestDto.getAnimalImages().replaceAll("\\s+", "").split(",")
+						: new String[0];
+
 		StringJoiner animalImageUriJoiner = new StringJoiner(", ");
-		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findById(salePostRequestDto.getAnimalTypeId());
+		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findById(animalSaleRequestDto.getAnimalTypeId());
 
-		AnimalSaleEntity salePostEntity = modelMapper.map(salePostRequestDto, AnimalSaleEntity.class);
-		salePostEntity.setCreatedAt(LocalDateTime.now());
-		salePostEntity.setUserEntity(userDtls);
-		salePostEntity.setAnimalTypeEntity(animalTypeEntity);
+		AnimalSaleEntity animalSaleEntity = modelMapper.map(animalSaleRequestDto, AnimalSaleEntity.class);
+		animalSaleEntity.setCreatedAt(LocalDateTime.now());
+		animalSaleEntity.setUserEntity(userDtls);
+		animalSaleEntity.setAnimalTypeEntity(animalTypeEntity);
 
-		AnimalSaleEntity savedSalePost = null;
-		savedSalePost = animalSaleService.save(salePostEntity);
+		AnimalSaleEntity SavedAnimalSaleEntity = null;
+		SavedAnimalSaleEntity = animalSaleService.save(animalSaleEntity);
 
 		for (String imageName : animalImages) {
 			MediaResourceEntity mediaResourceEntity = new MediaResourceEntity();
 			mediaResourceEntity.setMediaPath(imageName);
-			mediaResourceEntity.setAnimalSaleEntity(savedSalePost);
+			mediaResourceEntity.setAnimalSaleEntity(SavedAnimalSaleEntity);
 			mediaResourceEntity.setCreatedAt(LocalDateTime.now());
 			mediaResourceRepository.save(mediaResourceEntity);
 
@@ -104,17 +109,15 @@ public class AnimalSaleController {
 		}
 		String animalImageUri = animalImageUriJoiner.toString();
 
-		SalePostResponseDto salePostResponseDto = new SalePostResponseDto();
-		modelMapper.map(savedSalePost, salePostResponseDto);
-		salePostResponseDto.setAnimalImage(animalImageUri);
-		System.out.println("animalImages" + salePostResponseDto.getAnimalImages());
-		return new ResponseEntity<>(salePostResponseDto, HttpStatus.CREATED);
+		AnimalSaleResponseDto animalSaleResponseDto = new AnimalSaleResponseDto();
+		modelMapper.map(SavedAnimalSaleEntity, animalSaleResponseDto);
+		animalSaleResponseDto.setAnimalImage(animalImageUri);
+		return new ResponseEntity<>(animalSaleResponseDto, HttpStatus.CREATED);
 	}
 
 	@PutMapping("user/{userid}/animal-sale/{postid}")
-	public ResponseEntity<SalePostResponseDto> updateSalePost(@Valid @PathVariable("userid") long userId,
-			@PathVariable("postid") int salePostId,
-			@RequestBody SalePostRequestDto salePostRequestDto) {
+	public ResponseEntity<AnimalSaleResponseDto> updateSalePost(@Valid @PathVariable("userid") long userId,
+			@PathVariable("postid") int salePostId, @RequestBody AnimalSaleRequestDto animalSaleRequestDto) {
 
 		UserEntity userDtls = userRepository.findById(userId);
 		if (userDtls == null)
@@ -124,17 +127,17 @@ public class AnimalSaleController {
 		if (animalSaleEntity == null)
 			throw new SalePostNotFoundExeption("Id:" + salePostId);
 
-		modelMapper.map(salePostRequestDto, animalSaleEntity);
+		modelMapper.map(animalSaleRequestDto, animalSaleEntity);
 		animalSaleService.save(animalSaleEntity);
-		SalePostResponseDto salePostResponseDto = new SalePostResponseDto();
-		modelMapper.map(animalSaleEntity, salePostResponseDto);
-		return new ResponseEntity<>(salePostResponseDto, HttpStatus.ACCEPTED);
+		AnimalSaleResponseDto animalSaleResponseDto = new AnimalSaleResponseDto();
+		modelMapper.map(animalSaleEntity, animalSaleResponseDto);
+		return new ResponseEntity<>(animalSaleResponseDto, HttpStatus.ACCEPTED);
 	}
 
 	@DeleteMapping("/animal-sale/{id}")
 	public ResponseEntity<String> deleteSalePost(@PathVariable long id) {
-		AnimalSaleEntity salePostEntity = animalSaleRepository.findById(id);
-		if (salePostEntity == null)
+		AnimalSaleEntity animalSaleEntity = animalSaleRepository.findById(id);
+		if (animalSaleEntity == null)
 			throw new SalePostNotFoundExeption("Id:" + id);
 
 		animalSaleRepository.deleteById(id);
