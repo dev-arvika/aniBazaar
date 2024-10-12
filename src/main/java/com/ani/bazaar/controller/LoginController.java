@@ -30,18 +30,17 @@ public class LoginController {
 
 	@PostMapping("/api/login")
 	public ResponseEntity<LoginResponseDto> saveUser(@Valid @RequestBody LoginRequestDto loginRequestDto) {
-		UserEntity savedUser = null;
 		UserEntity userDtls = null;
 		userDtls = userService.getUserDtlsByPhone(loginRequestDto.getPhone());
 		if (userDtls != null) {
 			userDtls.setOtp(1234);
 			userDtls.setModifiedAt(LocalDateTime.now());
-			savedUser = userService.save(userDtls);
+			userService.save(userDtls);
 		} else {
 			UserEntity userEntity = modelMapper.map(loginRequestDto, UserEntity.class);
 			userEntity.setOtp(1234);
 			userEntity.setCreatedAt(LocalDateTime.now());
-			savedUser = userService.save(userEntity);
+			userService.save(userEntity);
 		}
 		LoginResponseDto loginResponseDto = new LoginResponseDto();
 		loginResponseDto.setMessage("OTP Generated");

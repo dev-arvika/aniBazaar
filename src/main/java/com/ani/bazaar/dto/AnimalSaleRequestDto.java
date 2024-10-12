@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class SalePostRequestDto {
+public class AnimalSaleRequestDto {
 
 	private long animalTypeId;
 	private int lactation;

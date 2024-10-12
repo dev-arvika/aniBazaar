@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 @Data
-public class SalePostResponseDto {
+public class AnimalSaleResponseDto {
 
 	private int lactation;
 	private int litersOfMilkDaily;

@@ -7,7 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ani.bazaar.dto.SalePostResponseDto;
+import com.ani.bazaar.dto.AnimalSaleResponseDto;
 import com.ani.bazaar.entity.AnimalSaleEntity;
 import com.ani.bazaar.repository.AnimalSaleRepository;
 
@@ -29,9 +29,9 @@ public class AnimalSaleServiceImpl implements AnimalSaleService {
 	}
 
 	@Override
-	public List<SalePostResponseDto> getAllAnimal() {
+	public List<AnimalSaleResponseDto> getAllAnimal() {
 		List<AnimalSaleEntity> saleposts = animalSaleRepository.findAll();
-		return saleposts.stream().map(salepost -> modelMapper.map(salepost, SalePostResponseDto.class))
+		return saleposts.stream().map(salepost -> modelMapper.map(salepost, AnimalSaleResponseDto.class))
 								.collect(Collectors.toList());
 	}
 

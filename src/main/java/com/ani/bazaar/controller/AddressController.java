@@ -10,12 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ani.bazaar.dto.AddressResponseDto;
 import com.ani.bazaar.dto.AddressRequestDto;
+import com.ani.bazaar.dto.AddressResponseDto;
 import com.ani.bazaar.entity.AddressEntity;
 import com.ani.bazaar.entity.UserEntity;
 import com.ani.bazaar.exception.AddressAlreadyExistException;
