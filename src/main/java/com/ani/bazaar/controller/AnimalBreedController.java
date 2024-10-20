@@ -30,20 +30,20 @@ import jakarta.validation.Valid;
 public class AnimalBreedController {
 
 	@Autowired
-	ModelMapper modelMapper;
+	private ModelMapper modelMapper;
 
 	@Autowired
-	AnimalBreedRepository animalBreedRepository;
+	private AnimalBreedRepository animalBreedRepository;
 
 	@Autowired
-	AnimalBreedService animalBreedService;
+	private AnimalBreedService animalBreedService;
 
 	@Autowired
-	AnimalTypeRepository animalTypeRepository;
+	private AnimalTypeRepository animalTypeRepository;
 
 	@GetMapping("api/animal/breed/{id}")
 	public ResponseEntity<AnimalBreedResponseDto> retriveAnimalBreedById(@PathVariable long id) {
-		AnimalBreedEntity animalBreedEntity = animalBreedRepository.findById(id);
+		AnimalBreedEntity animalBreedEntity = animalBreedRepository.findByBreedId(id);
 		if (animalBreedEntity == null)
 			throw new AnimalBreedNotFoundException("Id:" + id);
 
@@ -62,7 +62,7 @@ public class AnimalBreedController {
 	public ResponseEntity<AnimalBreedResponseDto> saveAnimalBreed(@Valid @PathVariable long id,
 			@RequestBody AnimalBreedRequestDto animalBreedRequestDto) {
 
-		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findById(id);
+		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findByTypeId(id);
 		if (animalTypeEntity == null)
 			throw new AnimalTypeNotFoundException("Id :" + id);
 
@@ -80,7 +80,7 @@ public class AnimalBreedController {
 	@PutMapping("api/animal/breed/{id}")
 	public ResponseEntity<AnimalBreedResponseDto> updateAnimalBreed(@Valid @PathVariable long id,
 			@RequestBody AnimalBreedRequestDto animalBreedRequestDto) {
-		AnimalBreedEntity animalBreedDtls = animalBreedRepository.findById(id);
+		AnimalBreedEntity animalBreedDtls = animalBreedRepository.findByBreedId(id);
 		if (animalBreedDtls == null)
 			throw new AnimalBreedNotFoundException("Id:" + id);
 
@@ -93,11 +93,11 @@ public class AnimalBreedController {
 
 	@DeleteMapping("api/animal/breed/{id}")
 	public ResponseEntity<String> deleteAnimalBreed(@PathVariable long id) {
-		AnimalBreedEntity animalBreedEntity = animalBreedRepository.findById(id);
+		AnimalBreedEntity animalBreedEntity = animalBreedRepository.findByBreedId(id);
 		if (animalBreedEntity == null)
 			throw new AnimalTypeNotFoundException("Id:" + id);
 
-		animalBreedRepository.deleteAnimalBreedEntityById(id);
+		animalBreedRepository.deleteAnimalBreedEntityByBreedId(id);
 		return new ResponseEntity<>("Animal Breed Removed.", HttpStatus.ACCEPTED);
 	}
 }

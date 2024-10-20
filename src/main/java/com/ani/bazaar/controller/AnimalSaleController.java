@@ -31,6 +31,7 @@ import com.ani.bazaar.repository.AnimalTypeRepository;
 import com.ani.bazaar.repository.MediaResourceRepository;
 import com.ani.bazaar.repository.UserRepository;
 import com.ani.bazaar.service.AnimalSaleService;
+import com.ani.bazaar.utils.AnimalSaleStatus;
 
 import jakarta.validation.Valid;
 
@@ -63,7 +64,7 @@ public class AnimalSaleController {
 
 	@GetMapping("/animal/sale/{id}")
 	public ResponseEntity<AnimalSaleResponseDto> getAnimalById(@PathVariable long id) {
-		AnimalSaleEntity animalSaleEntity = animalSaleRepository.findById(id);
+		AnimalSaleEntity animalSaleEntity = animalSaleRepository.findByAnimalId(id);
 		if (animalSaleEntity == null)
 			throw new SalePostNotFoundExeption("Id:" + id);
 
@@ -85,15 +86,16 @@ public class AnimalSaleController {
 						: new String[0];
 
 		StringJoiner animalImageUriJoiner = new StringJoiner(", ");
-		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findById(animalSaleRequestDto.getAnimalTypeId());
-
+		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findByTypeId(animalSaleRequestDto.getAnimalTypeId());
+				
 		AnimalSaleEntity animalSaleEntity = modelMapper.map(animalSaleRequestDto, AnimalSaleEntity.class);
+		animalSaleEntity.setAnimalId(null);
+		animalSaleEntity.setStatus(AnimalSaleStatus.PENDING);
 		animalSaleEntity.setCreatedAt(LocalDateTime.now());
 		animalSaleEntity.setUserEntity(userDtls);
 		animalSaleEntity.setAnimalTypeEntity(animalTypeEntity);
 
-		AnimalSaleEntity SavedAnimalSaleEntity = null;
-		SavedAnimalSaleEntity = animalSaleService.save(animalSaleEntity);
+		AnimalSaleEntity SavedAnimalSaleEntity = animalSaleService.save(animalSaleEntity);
 
 		for (String imageName : animalImages) {
 			MediaResourceEntity mediaResourceEntity = new MediaResourceEntity();
@@ -123,7 +125,7 @@ public class AnimalSaleController {
 		if (userDtls == null)
 			throw new UserNotFoundException("Id:" + userId);
 
-		AnimalSaleEntity animalSaleEntity = animalSaleRepository.findById(salePostId);
+		AnimalSaleEntity animalSaleEntity = animalSaleRepository.findByAnimalId(salePostId);
 		if (animalSaleEntity == null)
 			throw new SalePostNotFoundExeption("Id:" + salePostId);
 
@@ -136,7 +138,7 @@ public class AnimalSaleController {
 
 	@DeleteMapping("/animal-sale/{id}")
 	public ResponseEntity<String> deleteSalePost(@PathVariable long id) {
-		AnimalSaleEntity animalSaleEntity = animalSaleRepository.findById(id);
+		AnimalSaleEntity animalSaleEntity = animalSaleRepository.findByAnimalId(id);
 		if (animalSaleEntity == null)
 			throw new SalePostNotFoundExeption("Id:" + id);
 

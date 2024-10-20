@@ -52,7 +52,7 @@ public class LoginController {
 		UserEntity userDtls = userService.verifyByPhoneAndOtp(verifyRequestDto.getPhone(), verifyRequestDto.getOtp());
 		VerifyResponseDto verifyResponseDto = new VerifyResponseDto();
 		if (userDtls != null) {
-			verifyResponseDto.setUserId(userDtls.getId());
+			verifyResponseDto.setUserId(userDtls.getUserId());
 			verifyResponseDto.setName(userDtls.getUserName() != null ? userDtls.getUserName() : "");
 			verifyResponseDto.setAccessToken("accessToken");
 			verifyResponseDto.setRefreshToken("refreshToken");

@@ -9,8 +9,8 @@ import jakarta.transaction.Transactional;
 @Transactional
 public interface AnimalTypeRepository extends JpaRepository<AnimalTypeEntity, Integer>{
 	
-	AnimalTypeEntity findById(long id);
+	AnimalTypeEntity findByTypeId(long id);
 	
-	void deleteAnimalTypeEntityById(long id);
+	void deleteAnimalTypeEntityByTypeId(long id);
 	
 }

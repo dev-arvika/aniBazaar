@@ -31,7 +31,8 @@ public class UserEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	@Column(name = "user_id")
+	private long userId;
 
 	@Size(min = 2, message = "Name should be atleast 2 charectors")
 	@Column(name = "user_name")
@@ -72,7 +73,10 @@ public class UserEntity {
 	@Column(name = "modified_at")
 	private LocalDateTime modifiedAt;
 	
-	@OneToMany(mappedBy = "userEntity",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@JsonManagedReference
-	private List<AnimalSaleEntity> animalSaleEntities;
+	/*
+	 * @OneToMany(mappedBy = "userEntity",cascade = CascadeType.ALL, fetch =
+	 * FetchType.LAZY)
+	 * 
+	 * @JsonManagedReference private List<AnimalSaleEntity> animalSaleEntities;
+	 */
 }

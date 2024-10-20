@@ -18,7 +18,6 @@ public class AnimalSaleRequestDto {
 	private String calfWithAnimal;
 	private String moreInfo;
 	private int sellingPrice;
-	private String status;
 	private boolean isPrime;
 	private String animalImages;
 }
