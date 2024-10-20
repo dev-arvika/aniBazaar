@@ -53,6 +53,7 @@ public class UserController {
 
 	private final OccupationConfig occupationConfig;
 
+	@Autowired
 	public UserController(OccupationConfig occupationConfig) {
 		this.occupationConfig = occupationConfig;
 	}
