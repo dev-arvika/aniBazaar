@@ -1,6 +1,7 @@
 package com.ani.bazaar.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import com.ani.bazaar.repository.UserRepository;
 import com.ani.bazaar.service.UserService;
 import com.ani.bazaar.utils.DateUtils;
 import com.ani.bazaar.utils.FileUploadUtils;
+import com.ani.bazaar.utils.OccupationConfig;
 
 import jakarta.validation.Valid;
 
@@ -47,6 +49,12 @@ public class UserController {
 	@GetMapping("/users")
 	public List<UserEntity> retrieveAllUsers() {
 		return userRepository.findAll();
+	}
+
+	private final OccupationConfig occupationConfig;
+
+	public UserController(OccupationConfig occupationConfig) {
+		this.occupationConfig = occupationConfig;
 	}
 
 	@GetMapping("/users/{id}")
@@ -81,9 +89,13 @@ public class UserController {
 
 		List<LanguageEntity> languageEntities = languageRepository.findAll();
 		List<LanguageResponseDto> dtos = languageEntities.stream()
-			    .map(entity -> modelMapper.map(entity, LanguageResponseDto.class))
-			    .toList();
+				.map(entity -> modelMapper.map(entity, LanguageResponseDto.class)).toList();
 		return dtos;
+	}
+
+	@GetMapping("/users/occupations")
+	public List<Map<String, String>> getOccupations() throws Exception {
+		return occupationConfig.getOccupationOptions();
 	}
 
 	public UserResponseDto toDTO(UserEntity user) {
