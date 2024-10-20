@@ -1,8 +1,5 @@
 package com.ani.bazaar.entity;
 
-
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,16 +11,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "USER_LANGUAGE")
-public class LanguageEntity {
+@Entity(name = "ANIMAL_LACTATION")
+public class AnimalLactationEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long langId;
-	
-    private String language;
-    
-    private String descreption;
-    
-	private LocalDateTime createdAt;
+	private long lactId;
+
+	private String lactation;
 }

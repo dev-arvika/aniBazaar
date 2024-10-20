@@ -12,18 +12,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ani.bazaar.dto.AnimalTypeRequestDto;
 import com.ani.bazaar.dto.AnimalTypeResponseDto;
+import com.ani.bazaar.entity.AnimalLactationEntity;
 import com.ani.bazaar.entity.AnimalTypeEntity;
 import com.ani.bazaar.exception.AnimalTypeNotFoundException;
+import com.ani.bazaar.repository.AnimalLactationRepository;
 import com.ani.bazaar.repository.AnimalTypeRepository;
 import com.ani.bazaar.service.AnimalTypeService;
 
 import jakarta.validation.Valid;
 
 @RestController
+@RequestMapping("/api")
 public class AnimalTypeController {
 	@Autowired
 	ModelMapper modelMapper;
@@ -34,9 +38,12 @@ public class AnimalTypeController {
 	@Autowired
 	AnimalTypeRepository animalTypeRepository;
 
-	@GetMapping("api/animal/type/{id}")
+	@Autowired
+	AnimalLactationRepository animalLactationRepository;
+
+	@GetMapping("/animal/type/{id}")
 	public ResponseEntity<AnimalTypeResponseDto> retriveAnimalTypeById(@PathVariable long id) {
-		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findById(id);
+		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findByTypeId(id);
 		if (animalTypeEntity == null)
 			throw new AnimalTypeNotFoundException("Id:" + id);
 
@@ -45,13 +52,13 @@ public class AnimalTypeController {
 		return new ResponseEntity<>(animalTypeResponseDto, HttpStatus.OK);
 	}
 
-	@GetMapping("api/animal/types")
+	@GetMapping("/animal/types")
 	public ResponseEntity<List<AnimalTypeEntity>> getAllAnimalType() {
 		List<AnimalTypeEntity> animals = animalTypeRepository.findAll();
 		return new ResponseEntity<>(animals, HttpStatus.OK);
 	}
 
-	@PostMapping("api/animal/type")
+	@PostMapping("/animal/type")
 	public ResponseEntity<AnimalTypeResponseDto> saveAnimalType(
 			@RequestBody AnimalTypeRequestDto animalTypeRequestDto) {
 
@@ -65,10 +72,10 @@ public class AnimalTypeController {
 
 	}
 
-	@PutMapping("api/animal/type/{id}")
+	@PutMapping("/animal/type/{id}")
 	public ResponseEntity<AnimalTypeResponseDto> updateAnimalType(@Valid @PathVariable long id,
 			@RequestBody AnimalTypeRequestDto animalTypeRequestDto) {
-		AnimalTypeEntity animalTypeDtls = animalTypeRepository.findById(id);
+		AnimalTypeEntity animalTypeDtls = animalTypeRepository.findByTypeId(id);
 		if (animalTypeDtls == null)
 			throw new AnimalTypeNotFoundException("Id:" + id);
 
@@ -79,14 +86,19 @@ public class AnimalTypeController {
 		return new ResponseEntity<>(animalTypeResponseDto, HttpStatus.ACCEPTED);
 	}
 
-	@DeleteMapping("api/animal/type/{id}")
+	@DeleteMapping("/animal/type/{id}")
 	public ResponseEntity<String> deleteAnimalType(@PathVariable long id) {
-		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findById(id);
+		AnimalTypeEntity animalTypeEntity = animalTypeRepository.findByTypeId(id);
 		if (animalTypeEntity == null)
 			throw new AnimalTypeNotFoundException("Id:" + id);
 
-		animalTypeRepository.deleteAnimalTypeEntityById(id);
+		animalTypeRepository.deleteAnimalTypeEntityByTypeId(id);
 		return new ResponseEntity<>("Animal Type Removed.", HttpStatus.ACCEPTED);
 	}
 
+	@GetMapping("/animal/lactation")
+	public ResponseEntity<List<AnimalLactationEntity>> getAllLactation() {
+		List<AnimalLactationEntity> lactations = animalLactationRepository.findAll();
+		return new ResponseEntity<>(lactations, HttpStatus.OK);
+	}
 }

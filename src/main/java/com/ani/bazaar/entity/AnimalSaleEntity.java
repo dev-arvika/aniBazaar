@@ -3,12 +3,14 @@ package com.ani.bazaar.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.ani.bazaar.utils.AnimalSaleStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,16 +30,15 @@ public class AnimalSaleEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	@Column(name = "animal_id")
+	private Long animalId;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
-	@JsonBackReference
 	private UserEntity userEntity;
 	
 	@ManyToOne
 	@JoinColumn(name = "animal_type_id")
-	@JsonBackReference
 	private AnimalTypeEntity animalTypeEntity;
 	
 	@Column(name = "lactation")
@@ -74,8 +75,8 @@ public class AnimalSaleEntity {
 	@JsonManagedReference
 	private List<MediaResourceEntity> mediaResourceEntity;
 	
-	@Column(name = "status")
-	private String status;
+	@Enumerated(EnumType.STRING) // Store as string in the database
+    private AnimalSaleStatus status;
 	
 	@Column(name = "is_prime", columnDefinition = "boolean default false")
 	private boolean isPrime;

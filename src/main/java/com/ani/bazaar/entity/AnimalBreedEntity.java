@@ -21,7 +21,8 @@ public class AnimalBreedEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	@Column(name = "breed_id")
+	private long breedId;
 
 	@ManyToOne
 	@JoinColumn(name = "animal_type_id")

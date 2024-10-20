@@ -19,12 +19,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "ADDRESS")
+@Entity(name = "USER_ADDRESS")
 public class AddressEntity {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long addrId;
     
     private String address;
     

@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ani.bazaar.dto.LanguageResponseDto;
 import com.ani.bazaar.dto.UserRequestDto;
 import com.ani.bazaar.dto.UserResponseDto;
+import com.ani.bazaar.entity.LanguageEntity;
 import com.ani.bazaar.entity.UserEntity;
 import com.ani.bazaar.exception.UserNotFoundException;
+import com.ani.bazaar.repository.LanguageRepository;
 import com.ani.bazaar.repository.UserRepository;
 import com.ani.bazaar.service.UserService;
 import com.ani.bazaar.utils.DateUtils;
@@ -37,6 +40,9 @@ public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private LanguageRepository languageRepository;
 
 	@GetMapping("/users")
 	public List<UserEntity> retrieveAllUsers() {
@@ -68,6 +74,16 @@ public class UserController {
 	@DeleteMapping("/users/{id}")
 	public void deleteUserById(@PathVariable long id) {
 		userRepository.deleteById(id);
+	}
+
+	@GetMapping("/users/languages")
+	public List<LanguageResponseDto> retrieveAllLanguages() {
+
+		List<LanguageEntity> languageEntities = languageRepository.findAll();
+		List<LanguageResponseDto> dtos = languageEntities.stream()
+			    .map(entity -> modelMapper.map(entity, LanguageResponseDto.class))
+			    .toList();
+		return dtos;
 	}
 
 	public UserResponseDto toDTO(UserEntity user) {

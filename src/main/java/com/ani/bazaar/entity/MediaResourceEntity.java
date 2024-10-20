@@ -23,7 +23,7 @@ public class MediaResourceEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private long mediaId;
 	
 	@Column(name= "media_path")
 	private String mediaPath;
