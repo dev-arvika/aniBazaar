@@ -8,5 +8,5 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LanguageResponseDto {
 	private String language;
-	private String descreption;
+	private String description;
 }
