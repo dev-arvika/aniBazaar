@@ -23,7 +23,7 @@ public class LanguageEntity {
 	
     private String language;
     
-    private String descreption;
+    private String description;
     
 	private LocalDateTime createdAt;
 }

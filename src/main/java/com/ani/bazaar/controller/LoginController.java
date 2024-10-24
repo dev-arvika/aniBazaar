@@ -14,6 +14,7 @@ import com.ani.bazaar.dto.LoginRequestDto;
 import com.ani.bazaar.dto.LoginResponseDto;
 import com.ani.bazaar.dto.VerifyRequestDto;
 import com.ani.bazaar.dto.VerifyResponseDto;
+import com.ani.bazaar.entity.LanguageEntity;
 import com.ani.bazaar.entity.UserEntity;
 import com.ani.bazaar.service.UserService;
 
@@ -37,8 +38,11 @@ public class LoginController {
 			userDtls.setModifiedAt(LocalDateTime.now());
 			userService.save(userDtls);
 		} else {
+			LanguageEntity lang = new LanguageEntity();
+			lang.setLangId(1);
 			UserEntity userEntity = modelMapper.map(loginRequestDto, UserEntity.class);
 			userEntity.setOtp(1234);
+			userEntity.setSelectLang(lang);
 			userEntity.setCreatedAt(LocalDateTime.now());
 			userService.save(userEntity);
 		}
